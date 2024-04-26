@@ -1,0 +1,20 @@
+function x_par_new = sampling(x_par_old, w_par)
+% x_par_old : old particle state [N x Ns]
+% w_par : particle weight [1 x Ns]
+% x_par_new : new particle state [N x Ns]
+
+    % number of states
+    N = size(x_par_old, 1);
+    % number of particles
+    Ns = size(x_par_old, 2);
+    x_par_new = nan(size(x_par_old));
+    
+    for ii = 1 : N
+        % calculate kernel density using particle and weights
+        [f_short, x_short] = ksdensity(x_par_old(ii, :), [], 'Weights', w_par);
+        F_short = cumsum(f_short);
+        
+        below_F = (unifrnd(0, 1, 1, Ns) > F_short.');
+        x_par_new(ii, :) = x_short(find(below_F, 1, 'first'));
+    end
+end
